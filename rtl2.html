@@ -1,0 +1,444 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>時空文字轉換器3000</title>
+    <style>
+      @import url("https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700&display=swap");
+
+      @font-face {
+        font-family: "kaiu";
+        src: url("kaiu.ttf") format("truetype");
+      }
+
+      @font-face {
+        font-family: "kim";
+        src: url("kim.ttf") format("truetype");
+      }
+
+      @font-face {
+        font-family: "xiao-yao";
+        src: url("xiao-yao.ttf") format("truetype");
+      }
+
+      @font-face {
+        font-family: "qian-li";
+        src: url("qian-li.ttf") format("truetype");
+      }
+
+      @font-face {
+        font-family: "beauty";
+        src: url("beauty.ttf") format("truetype");
+      }
+
+      @font-face {
+        font-family: "PenCrane";
+        src: url("PenCrane.ttf") format("truetype");
+      }
+
+      :root {
+        --primary-color: #00ffff;
+        --secondary-color: #ff00f2;
+        --background-color: #000033;
+      }
+
+      body,
+      html {
+        margin: 0;
+        padding: 0;
+        font-family: "Orbitron", sans-serif;
+        background-color: var(--background-color);
+        color: var(--primary-color);
+      }
+
+      #particle-canvas {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        z-index: -1;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: start;
+        padding: 20px;
+        box-sizing: border-box;
+      }
+
+      .hologram {
+        position: relative;
+        padding: 30px;
+        background: rgba(0, 255, 255, 0.1);
+        border-radius: 20px;
+        box-shadow: 0 0 50px rgba(0, 255, 255, 0.5);
+        overflow: hidden;
+      }
+
+      .hologram::before {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          to bottom right,
+          rgba(0, 255, 255, 0.2) 0%,
+          rgba(255, 0, 255, 0.2) 50%,
+          rgba(0, 255, 255, 0.2) 100%
+        );
+        animation: hologramRotate 10s linear infinite;
+      }
+
+      @keyframes hologramRotate {
+        0% {
+          transform: rotate(0deg);
+        }
+        100% {
+          transform: rotate(360deg);
+        }
+      }
+
+      .control-form {
+        position: relative;
+        z-index: 1;
+      }
+
+      h1 {
+        font-size: 36px;
+        text-align: center;
+        margin-top: 10px;
+        margin-bottom: 20px;
+        text-shadow: 0 0 10px var(--primary-color),
+          0 0 20px var(--secondary-color);
+      }
+
+      .control-form select,
+      textarea,
+      input,
+      button {
+        width: 100%;
+        padding: 15px;
+        margin-top: 10px;
+        margin-bottom: 10px;
+        background: rgba(0, 0, 0, 0.7);
+        border: 2px solid var(--primary-color);
+        border-radius: 10px;
+        color: var(--primary-color);
+        font-family: "Orbitron", sans-serif;
+        font-size: 16px;
+        transition: all 0.3s ease;
+      }
+
+      textarea {
+        width: 380px;
+        height: 150px;
+        resize: vertical;
+      }
+
+      input {
+        width: 80px;
+        margin-right: 10px;
+      }
+
+      button {
+        background: linear-gradient(
+          45deg,
+          var(--primary-color),
+          var(--secondary-color)
+        );
+        color: var(--background-color);
+        font-weight: bold;
+        cursor: pointer;
+        border: none;
+        position: relative;
+        overflow: hidden;
+      }
+
+      button::after {
+        content: "";
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: linear-gradient(
+          to bottom right,
+          rgba(255, 255, 255, 0.2) 0%,
+          rgba(255, 255, 255, 0.4) 50%,
+          rgba(255, 255, 255, 0.2) 100%
+        );
+        transform: rotate(45deg);
+        animation: buttonShine 3s infinite linear;
+      }
+
+      @keyframes buttonShine {
+        0% {
+          left: -50%;
+        }
+        100% {
+          left: 150%;
+        }
+      }
+      .input-group {
+        display: flex;
+        justify-content: space-between;
+        width: 100%;
+        margin-bottom: 15px;
+        column-gap: 10px;
+      }
+
+      .vertical-text {
+        writing-mode: vertical-rl;
+        font-family: "kaiu";
+        font-size: 56px;
+        line-height: 1;
+        background-color: rgba(0, 255, 255, 0.1);
+        padding: 20px;
+        border-radius: 15px;
+        box-shadow: 0 0 30px rgba(0, 255, 255, 0.3);
+        margin-top: 20px;
+        max-height: 80vh;
+        overflow-x: auto;
+      }
+
+      /* 自定義滾動條 */
+      .vertical-text::-webkit-scrollbar {
+        width: 10px;
+      }
+
+      .vertical-text::-webkit-scrollbar-track {
+        background: rgba(0, 255, 255, 0.1);
+      }
+
+      .vertical-text::-webkit-scrollbar-thumb {
+        background: var(--primary-color);
+        border-radius: 5px;
+      }
+
+      @keyframes textGlow {
+        0% {
+          text-shadow: 0 0 5px var(--primary-color);
+        }
+        50% {
+          text-shadow: 0 0 20px var(--primary-color),
+            0 0 30px var(--secondary-color);
+        }
+        100% {
+          text-shadow: 0 0 5px var(--primary-color);
+        }
+      }
+
+      .vertical-text p {
+        margin: 0;
+        animation: textGlow 2s infinite;
+      }
+
+      #font-select {
+        background-color: rgb(10, 10, 10);
+      }
+    </style>
+  </head>
+  <body>
+    <canvas id="particle-canvas"></canvas>
+    <div class="container">
+      <div class="hologram">
+        <div class="control-form" style="text-align: center">
+          <h1>時空文字轉換器3000</h1>
+          <textarea
+            id="input-text"
+            rows="10"
+            cols="50"
+            placeholder="輸入你的時空訊息.."
+          ></textarea>
+
+          <div class="input-group">
+            <label>
+              <div style="text-align: center">行高</div>
+              <input
+                type="number"
+                id="line-height-input"
+                min="0"
+                max="2"
+                step="0.1"
+                value="1"
+                placeholder="量子行高"
+              />
+            </label>
+            <label>
+              <div style="text-align: center">字距</div>
+              <input
+                type="number"
+                id="letter-spacing-input"
+                min="0"
+                max="10"
+                step="1"
+                value="0"
+                placeholder="時空字距"
+              />
+            </label>
+            <label>
+              <div style="text-align: center">字體大小</div>
+              <input
+                type="number"
+                id="font-size-input"
+                min="0"
+                max="200"
+                step="1"
+                value="56"
+                placeholder="時空字體大小"
+              />
+            </label>
+            <label>
+              <div style="text-align: center">字體選擇</div>
+              <select id="font-select">
+                <option value="kaiu">標階體</option>
+                <option value="kim">瘦金體</option>
+                <option value="xiao-yao">楷書</option>
+                <option value="qian-li">行楷體</option>
+                <option value="beauty">簪花小楷</option>
+                <option value="PenCrane">鋼筆手書體</option>
+              </select>
+            </label>
+          </div>
+          <button onclick="transformText()">啟動時空轉換</button>
+        </div>
+      </div>
+      <div class="vertical-text" id="output-text"></div>
+    </div>
+
+    <script>
+      // 粒子動畫
+      const canvas = document.getElementById("particle-canvas");
+      const ctx = canvas.getContext("2d");
+
+      canvas.width = window.innerWidth;
+      canvas.height = window.innerHeight;
+
+      const particles = [];
+      const particleCount = 100;
+
+      class Particle {
+        constructor() {
+          this.x = Math.random() * canvas.width;
+          this.y = Math.random() * canvas.height;
+          this.size = Math.random() * 3 + 1;
+          this.speedX = Math.random() * 3 - 1.5;
+          this.speedY = Math.random() * 3 - 1.5;
+        }
+
+        update() {
+          this.x += this.speedX;
+          this.y += this.speedY;
+
+          if (this.size > 0.2) this.size -= 0.1;
+
+          if (this.x < 0 || this.x > canvas.width) this.speedX *= -1;
+          if (this.y < 0 || this.y > canvas.height) this.speedY *= -1;
+        }
+
+        draw() {
+          ctx.fillStyle = "rgba(0, 255, 255, " + this.size / 3 + ")";
+          ctx.beginPath();
+          ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2);
+          ctx.fill();
+        }
+      }
+
+      function initParticles() {
+        for (let i = 0; i < particleCount; i++) {
+          particles.push(new Particle());
+        }
+      }
+
+      function animateParticles() {
+        ctx.clearRect(0, 0, canvas.width, canvas.height);
+        for (let i = 0; i < particles.length; i++) {
+          particles[i].update();
+          particles[i].draw();
+        }
+        requestAnimationFrame(animateParticles);
+      }
+
+      initParticles();
+      animateParticles();
+
+      // 文字轉換功能
+      function transformText() {
+        const inputText = document.getElementById("input-text").value;
+        const lines = inputText.split("\n");
+        const outputText = document.getElementById("output-text");
+        outputText.innerHTML = "";
+
+        lines.forEach((line, index) => {
+          setTimeout(() => {
+            const p = document.createElement("p");
+            outputText.appendChild(p);
+            typeWriter(p, line, 0);
+          }, index * 500);
+        });
+
+        updateTextStyles();
+      }
+
+      function typeWriter(element, text, i) {
+        if (i < text.length) {
+          element.textContent += text.charAt(i);
+          setTimeout(() => typeWriter(element, text, i + 1), 50);
+        }
+      }
+
+      function updateTextStyles() {
+        const verticalText = document.querySelector(".vertical-text");
+        const lineHeight = document.getElementById("line-height-input").value;
+        const letterSpacing = document.getElementById(
+          "letter-spacing-input"
+        ).value;
+        const fontSize = document.getElementById("font-size-input").value;
+        const fontSelect = document.getElementById("font-select").value;
+
+        verticalText.style.lineHeight = lineHeight;
+        verticalText.style.letterSpacing = `${letterSpacing}px`;
+        verticalText.style.fontSize = `${fontSize}px`;
+        verticalText.style.fontFamily = `${fontSelect}`;
+      }
+
+      // 添加鍵盤快捷鍵
+      document.addEventListener("keydown", function (event) {
+        if (event.ctrlKey && event.key === "Enter") {
+          transformText();
+        }
+      });
+
+      // 添加音效
+      function playSound(frequency, duration) {
+        const audioCtx = new (window.AudioContext ||
+          window.webkitAudioContext)();
+        const oscillator = audioCtx.createOscillator();
+        oscillator.type = "sine";
+        oscillator.frequency.setValueAtTime(frequency, audioCtx.currentTime);
+        oscillator.connect(audioCtx.destination);
+        oscillator.start();
+        oscillator.stop(audioCtx.currentTime + duration);
+      }
+
+      document.querySelector("button").addEventListener("click", () => {
+        playSound(130, 0.1);
+      });
+
+      // 添加動態背景色變化
+      function changeBackgroundColor() {
+        const hue = (Date.now() / 100) % 360;
+        document.body.style.backgroundColor = `hsl(${hue}, 50%, 10%)`;
+        requestAnimationFrame(changeBackgroundColor);
+      }
+
+      changeBackgroundColor();
+    </script>
+  </body>
+</html>
