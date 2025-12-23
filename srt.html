@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>字幕提取器</title>
+    <link
+      rel="stylesheet"
+      href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css"
+    />
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+        font-family: "Cinzel", "Times New Roman", serif;
+      }
+
+      body {
+        background: radial-gradient(
+            circle at 20% 50%,
+            rgba(10, 10, 20, 0.8) 0%,
+            transparent 50%
+          ),
+          radial-gradient(
+            circle at 80% 20%,
+            rgba(30, 5, 30, 0.6) 0%,
+            transparent 50%
+          ),
+          linear-gradient(
+            135deg,
+            #0c0c14 0%,
+            #1a0a1a 30%,
+            #0f0a15 70%,
+            #0c0c18 100%
+          );
+        color: #d4d4dc;
+        min-height: 100vh;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding: 20px;
+        position: relative;
+        overflow-x: hidden;
+      }
+
+      body::before {
+        content: "";
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-image: radial-gradient(
+            circle at 30% 40%,
+            rgba(120, 0, 120, 0.05) 0%,
+            transparent 8%
+          ),
+          radial-gradient(
+            circle at 70% 60%,
+            rgba(80, 0, 150, 0.05) 0%,
+            transparent 8%
+          ),
+          radial-gradient(
+            circle at 50% 20%,
+            rgba(0, 80, 120, 0.05) 0%,
+            transparent 8%
+          );
+        z-index: -1;
+      }
+
+      .container {
+        width: 100%;
+        max-width: 800px;
+        background: rgba(15, 10, 20, 0.85);
+        border-radius: 15px;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.7),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1),
+          0 0 0 1px rgba(80, 30, 100, 0.3);
+        overflow: hidden;
+        border: 1px solid rgba(100, 60, 120, 0.4);
+        position: relative;
+      }
+
+      .container::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: 0;
+        right: 0;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(150, 80, 180, 0.5) 20%,
+          rgba(150, 80, 180, 0.8) 50%,
+          rgba(150, 80, 180, 0.5) 80%,
+          transparent 100%
+        );
+      }
+
+      .header {
+        background: linear-gradient(
+            to bottom,
+            rgba(40, 10, 50, 0.9) 0%,
+            rgba(20, 5, 30, 0.9) 100%
+          ),
+          url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="100" height="100" viewBox="0 0 100 100"><path d="M20,20 Q50,5 80,20 T100,50 T80,80 T50,95 T20,80 T0,50 T20,20 Z" fill="none" stroke="rgba(120,60,150,0.2)" stroke-width="1"/></svg>');
+        color: #e6e6fa;
+        padding: 30px 40px;
+        text-align: center;
+        border-bottom: 2px solid rgba(100, 60, 130, 0.6);
+        position: relative;
+        overflow: hidden;
+      }
+
+      .header::after {
+        content: "";
+        position: absolute;
+        bottom: 0;
+        left: 10%;
+        right: 10%;
+        height: 1px;
+        background: linear-gradient(
+          90deg,
+          transparent 0%,
+          rgba(150, 80, 180, 0.7) 30%,
+          rgba(150, 80, 180, 0.9) 50%,
+          rgba(150, 80, 180, 0.7) 70%,
+          transparent 100%
+        );
+      }
+
+      .header h1 {
+        font-size: 2.5rem;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        gap: 15px;
+        text-shadow: 0 2px 4px rgba(0, 0, 0, 0.7),
+          0 0 10px rgba(150, 80, 180, 0.5);
+        letter-spacing: 1px;
+        font-weight: 700;
+      }
+
+      .header h1 i {
+        color: #9d4edd;
+        filter: drop-shadow(0 0 5px rgba(157, 78, 221, 0.7));
+      }
+
+      .header p {
+        font-size: 1.1rem;
+        opacity: 0.85;
+        max-width: 600px;
+        margin: 0 auto;
+        font-family: "Crimson Text", serif;
+        line-height: 1.6;
+      }
+
+      .content {
+        padding: 40px;
+      }
+
+      .upload-area {
+        border: 2px dashed rgba(150, 80, 180, 0.6);
+        border-radius: 12px;
+        padding: 50px 30px;
+        text-align: center;
+        background-color: rgba(25, 15, 35, 0.5);
+        margin-bottom: 30px;
+        cursor: pointer;
+        transition: all 0.4s ease;
+        position: relative;
+        backdrop-filter: blur(5px);
+      }
+
+      .upload-area:hover,
+      .upload-area.dragover {
+        background-color: rgba(40, 20, 50, 0.7);
+        border-color: #9d4edd;
+        box-shadow: 0 0 20px rgba(157, 78, 221, 0.3),
+          inset 0 0 20px rgba(157, 78, 221, 0.1);
+        transform: translateY(-5px);
+      }
+
+      .upload-icon {
+        font-size: 4rem;
+        color: #9d4edd;
+        margin-bottom: 20px;
+        filter: drop-shadow(0 0 8px rgba(157, 78, 221, 0.7));
+      }
+
+      .upload-area h3 {
+        font-size: 1.5rem;
+        margin-bottom: 15px;
+        color: #e6e6fa;
+        text-shadow: 0 1px 3px rgba(0, 0, 0, 0.7);
+      }
+
+      .upload-area p {
+        color: #b8b8d0;
+        margin-bottom: 25px;
+        font-family: "Crimson Text", serif;
+        font-size: 1.05rem;
+      }
+
+      .btn {
+        display: inline-block;
+        background: linear-gradient(
+          to right,
+          #3a0a3a 0%,
+          #5a1a5a 30%,
+          #7d2c7d 70%,
+          #5a1a5a 100%
+        );
+        color: #f0e6ff;
+        border: none;
+        padding: 15px 30px;
+        font-size: 1.1rem;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+        font-weight: 600;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5),
+          0 0 0 1px rgba(157, 78, 221, 0.3),
+          inset 0 1px 0 rgba(255, 255, 255, 0.1);
+        position: relative;
+        overflow: hidden;
+        letter-spacing: 0.5px;
+      }
+
+      .btn::before {
+        content: "";
+        position: absolute;
+        top: 0;
+        left: -100%;
+        width: 100%;
+        height: 100%;
+        background: linear-gradient(
+          90deg,
+          transparent,
+          rgba(255, 255, 255, 0.1),
+          transparent
+        );
+        transition: left 0.7s ease;
+      }
+
+      .btn:hover {
+        transform: translateY(-3px);
+        box-shadow: 0 8px 20px rgba(0, 0, 0, 0.6),
+          0 0 0 1px rgba(157, 78, 221, 0.5),
+          inset 0 1px 0 rgba(255, 255, 255, 0.15);
+        background: linear-gradient(
+          to right,
+          #4a0a4a 0%,
+          #6a2a6a 30%,
+          #8d3c8d 70%,
+          #6a2a6a 100%
+        );
+      }
+
+      .btn:hover::before {
+        left: 100%;
+      }
+
+      .btn:active {
+        transform: translateY(0);
+      }
+
+      .btn i {
+        margin-right: 10px;
+      }
+
+      .file-input {
+        display: none;
+      }
+
+      .file-info {
+        background-color: rgba(30, 20, 40, 0.7);
+        border-radius: 10px;
+        padding: 20px;
+        margin-top: 20px;
+        display: none;
+        border: 1px solid rgba(100, 60, 130, 0.4);
+        box-shadow: inset 0 0 15px rgba(0, 0, 0, 0.3);
+      }
+
+      .file-info.show {
+        display: block;
+        animation: fadeIn 0.5s ease;
+      }
+
+      @keyframes fadeIn {
+        from {
+          opacity: 0;
+          transform: translateY(10px);
+        }
+        to {
+          opacity: 1;
+          transform: translateY(0);
+        }
+      }
+
+      .file-info h4 {
+        color: #c77dff;
+        margin-bottom: 10px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+      }
+
+      .file-details {
+        display: flex;
+        flex-wrap: wrap;
+        gap: 15px;
+        margin-top: 15px;
+      }
+
+      .file-detail {
+        background: linear-gradient(
+          to bottom,
+          rgba(40, 25, 50, 0.8) 0%,
+          rgba(30, 15, 40, 0.9) 100%
+        );
+        padding: 12px 15px;
+        border-radius: 8px;
+        box-shadow: 0 3px 10px rgba(0, 0, 0, 0.3),
+          inset 0 1px 0 rgba(255, 255, 255, 0.05);
+        flex: 1;
+        min-width: 150px;
+        border: 1px solid rgba(100, 60, 130, 0.3);
+      }
+
+      .file-detail .label {
+        font-size: 0.9rem;
+        color: #b8b8d0;
+        margin-bottom: 5px;
+        font-family: "Crimson Text", serif;
+      }
+
+      .file-detail .value {
+        font-weight: 600;
+        color: #f0e6ff;
+        word-break: break-all;
+      }
+
+      .process-btn {
+        width: 100%;
+        margin-top: 30px;
+        display: none;
+      }
+
+      .process-btn.show {
+        display: block;
+        animation: fadeIn 0.5s ease;
+      }
+
+      .instructions {
+        background-color: rgba(25, 15, 35, 0.7);
+        border-radius: 12px;
+        padding: 25px;
+        margin-top: 40px;
+        border-left: 4px solid #9d4edd;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      }
+
+      .instructions h3 {
+        color: #c77dff;
+        margin-bottom: 15px;
+        display: flex;
+        align-items: center;
+        gap: 10px;
+        text-shadow: 0 1px 2px rgba(0, 0, 0, 0.7);
+      }
+
+      .instructions ol {
+        margin-left: 20px;
+        color: #d4d4dc;
+        font-family: "Crimson Text", serif;
+      }
+
+      .instructions li {
+        margin-bottom: 10px;
+        line-height: 1.5;
+        padding-left: 5px;
+      }
+
+      .instructions li::marker {
+        color: #9d4edd;
+        font-weight: bold;
+      }
+
+      .footer {
+        text-align: center;
+        padding: 20px;
+        color: #888;
+        font-size: 0.9rem;
+        border-top: 1px solid rgba(100, 60, 130, 0.4);
+        background-color: rgba(20, 10, 30, 0.8);
+        font-family: "Crimson Text", serif;
+      }
+
+      .toast {
+        position: fixed;
+        bottom: 30px;
+        right: 30px;
+        background: linear-gradient(
+          to right,
+          rgba(40, 10, 50, 0.95) 0%,
+          rgba(60, 20, 70, 0.95) 100%
+        );
+        color: #f0e6ff;
+        padding: 15px 25px;
+        border-radius: 8px;
+        box-shadow: 0 5px 15px rgba(0, 0, 0, 0.5),
+          0 0 0 1px rgba(157, 78, 221, 0.4);
+        display: flex;
+        align-items: center;
+        gap: 15px;
+        z-index: 1000;
+        transform: translateY(100px);
+        opacity: 0;
+        transition: all 0.4s ease;
+        border: 1px solid rgba(150, 80, 180, 0.5);
+        max-width: 350px;
+        backdrop-filter: blur(5px);
+      }
+
+      .toast.show {
+        transform: translateY(0);
+        opacity: 1;
+      }
+
+      .toast.success {
+        background: linear-gradient(
+          to right,
+          rgba(20, 60, 40, 0.95) 0%,
+          rgba(30, 80, 50, 0.95) 100%
+        );
+        border-color: rgba(100, 200, 150, 0.5);
+      }
+
+      .toast.error {
+        background: linear-gradient(
+          to right,
+          rgba(60, 20, 30, 0.95) 0%,
+          rgba(80, 30, 40, 0.95) 100%
+        );
+        border-color: rgba(200, 100, 120, 0.5);
+      }
+
+      .gothic-ornament {
+        position: absolute;
+        font-size: 1.5rem;
+        color: rgba(150, 80, 180, 0.3);
+        z-index: -1;
+      }
+
+      .ornament-top-left {
+        top: 15px;
+        left: 15px;
+      }
+
+      .ornament-top-right {
+        top: 15px;
+        right: 15px;
+        transform: scaleX(-1);
+      }
+
+      .ornament-bottom-left {
+        bottom: 15px;
+        left: 15px;
+        transform: scaleY(-1);
+      }
+
+      .ornament-bottom-right {
+        bottom: 15px;
+        right: 15px;
+        transform: scale(-1, -1);
+      }
+
+      @media (max-width: 768px) {
+        .container {
+          max-width: 95%;
+        }
+
+        .header {
+          padding: 25px 20px;
+        }
+
+        .header h1 {
+          font-size: 2rem;
+        }
+
+        .content {
+          padding: 25px;
+        }
+
+        .upload-area {
+          padding: 30px 20px;
+        }
+
+        .file-details {
+          flex-direction: column;
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="header">
+        <h1><i class="fas fa-closed-captioning"></i> 字幕提取器</h1>
+        <p>快速從視頻編輯項目文件中提取字幕，並轉換為SRT格式</p>
+      </div>
+
+      <div class="content">
+        <div class="upload-area" id="dropArea">
+          <div class="upload-icon">
+            <i class="fas fa-cloud-upload-alt"></i>
+          </div>
+          <h3>拖放文件到這里</h3>
+          <p>或者點擊按鈕選擇項目文件 (.json)</p>
+          <label for="jsonFile" class="btn">
+            <i class="fas fa-folder-open"></i> 選擇文件
+          </label>
+          <input type="file" id="jsonFile" accept=".json" class="file-input" />
+        </div>
+
+        <div class="file-info" id="fileInfo">
+          <h4><i class="fas fa-file-alt"></i> 已選擇文件</h4>
+          <div class="file-details">
+            <div class="file-detail">
+              <div class="label">文件名</div>
+              <div class="value" id="fileName">-</div>
+            </div>
+            <div class="file-detail">
+              <div class="label">文件大小</div>
+              <div class="value" id="fileSize">-</div>
+            </div>
+            <div class="file-detail">
+              <div class="label">類型</div>
+              <div class="value">JSON 項目文件</div>
+            </div>
+          </div>
+        </div>
+
+        <button class="btn process-btn" id="processBtn">
+          <i class="fas fa-cogs"></i> 提取字幕
+        </button>
+
+        <div class="instructions">
+          <h3><i class="fas fa-info-circle"></i> 使用說明</h3>
+          <ol>
+            <li>從您的視頻編輯軟件中導出項目文件（JSON格式）</li>
+            <li>將文件拖放到上方區域或點擊"選擇文件"按鈕</li>
+            <li>點擊"提取字幕"按鈕開始處理</li>
+            <li>處理完成後會自動下載SRT字幕文件</li>
+            <li>您可以將SRT文件導入到任何視頻播放器或編輯軟件中</li>
+          </ol>
+        </div>
+      </div>
+
+      <div class="footer">
+        <p>© 字幕提取器 | 安全、快速、易用的字幕提取工具</p>
+      </div>
+    </div>
+
+    <div class="toast" id="toast">
+      <i class="fas fa-check-circle"></i>
+      <span id="toastMessage">操作成功！</span>
+    </div>
+
+    <script>
+      // 獲取DOM元素
+      const dropArea = document.getElementById("dropArea");
+      const fileInput = document.getElementById("jsonFile");
+      const fileInfo = document.getElementById("fileInfo");
+      const processBtn = document.getElementById("processBtn");
+      const toast = document.getElementById("toast");
+      const toastMessage = document.getElementById("toastMessage");
+
+      let selectedFile = null;
+
+      // 拖放功能
+      dropArea.addEventListener("dragover", (e) => {
+        e.preventDefault();
+        dropArea.classList.add("dragover");
+      });
+
+      dropArea.addEventListener("dragleave", () => {
+        dropArea.classList.remove("dragover");
+      });
+
+      dropArea.addEventListener("drop", (e) => {
+        e.preventDefault();
+        dropArea.classList.remove("dragover");
+
+        if (e.dataTransfer.files.length) {
+          handleFile(e.dataTransfer.files[0]);
+        }
+      });
+
+      // 文件選擇功能
+      fileInput.addEventListener("change", (e) => {
+        if (e.target.files.length) {
+          handleFile(e.target.files[0]);
+        }
+      });
+
+      // 處理文件
+      function handleFile(file) {
+        // 檢查文件類型
+        if (!file.name.toLowerCase().endsWith(".json")) {
+          showToast("請選擇JSON格式的文件", "error");
+          return;
+        }
+
+        selectedFile = file;
+
+        // 顯示文件信息
+        document.getElementById("fileName").textContent = file.name;
+        document.getElementById("fileSize").textContent = formatFileSize(
+          file.size
+        );
+        fileInfo.classList.add("show");
+        processBtn.classList.add("show");
+
+        showToast(`已選擇文件: ${file.name}`);
+      }
+
+      // 處理按鈕點擊
+      processBtn.addEventListener("click", processFile);
+
+      // 處理文件函數
+      async function processFile() {
+        if (!selectedFile) {
+          showToast("請先選擇一個文件", "error");
+          return;
+        }
+
+        // 顯示處理中狀態
+        processBtn.innerHTML =
+          '<i class="fas fa-spinner fa-spin"></i> 處理中...';
+        processBtn.disabled = true;
+
+        try {
+          const reader = new FileReader();
+
+          reader.onload = function (e) {
+            try {
+              const projectData = JSON.parse(e.target.result);
+              const srtContent = extractLyricsToSRT(projectData);
+
+              // 下載SRT文件
+              const blob = new Blob([srtContent], {
+                type: "text/plain;charset=utf-8",
+              });
+              const url = URL.createObjectURL(blob);
+              const a = document.createElement("a");
+              a.href = url;
+              a.download = selectedFile.name.replace(".json", "") + "_字幕.srt";
+              document.body.appendChild(a);
+              a.click();
+              document.body.removeChild(a);
+              URL.revokeObjectURL(url);
+
+              showToast("字幕提取完成！文件已開始下載", "success");
+            } catch (error) {
+              showToast("處理文件時出錯：文件格式不正確", "error");
+              console.error("JSON解析錯誤:", error);
+            } finally {
+              // 恢覆按鈕狀態
+              processBtn.innerHTML = '<i class="fas fa-cogs"></i> 提取字幕';
+              processBtn.disabled = false;
+            }
+          };
+
+          reader.onerror = function () {
+            showToast("讀取文件時出錯", "error");
+            processBtn.innerHTML = '<i class="fas fa-cogs"></i> 提取字幕';
+            processBtn.disabled = false;
+          };
+
+          reader.readAsText(selectedFile);
+        } catch (error) {
+          showToast("處理文件時出錯", "error");
+          console.error("處理錯誤:", error);
+          processBtn.innerHTML = '<i class="fas fa-cogs"></i> 提取字幕';
+          processBtn.disabled = false;
+        }
+      }
+
+      // 字幕提取核心函數
+      function extractLyricsToSRT(projectData) {
+        // 解析數據（如果是字符串則轉為對象）
+        const data =
+          typeof projectData === "string"
+            ? JSON.parse(projectData)
+            : projectData;
+
+        // 提取字幕信息
+        const subtitles = [];
+
+        // 查找所有字幕文本
+        const textMaterials = data.materials.texts || [];
+
+        // 根據每個字幕的時間軸（tracks）來配對
+        data.tracks.forEach((track) => {
+          if (track.type === "text" && track.segments) {
+            track.segments.forEach((segment) => {
+              if (segment.material_id && segment.target_timerange) {
+                // 找到對應的文字素材
+                const textMaterial = textMaterials.find(
+                  (t) => t.id === segment.material_id
+                );
+                if (textMaterial && textMaterial.content) {
+                  try {
+                    // 解析 content 字段（包含富文本信息）
+                    const contentObj = JSON.parse(textMaterial.content);
+                    const text = contentObj.text || "";
+
+                    if (text.trim()) {
+                      // 計算時間
+                      const startMs = segment.target_timerange.start / 1000; // 轉為毫秒
+                      const durationMs =
+                        segment.target_timerange.duration / 1000; // 轉為毫秒
+                      const endMs = startMs + durationMs;
+
+                      subtitles.push({
+                        text: text,
+                        start: startMs,
+                        end: endMs,
+                        startTime: segment.target_timerange.start,
+                        endTime:
+                          segment.target_timerange.start +
+                          segment.target_timerange.duration,
+                      });
+                    }
+                  } catch (e) {
+                    // 如果解析失敗，嘗試直接讀取 content 作為純文本
+                    if (textMaterial.content.trim()) {
+                      const startMs = segment.target_timerange.start / 1000;
+                      const durationMs =
+                        segment.target_timerange.duration / 1000;
+                      const endMs = startMs + durationMs;
+
+                      subtitles.push({
+                        text: textMaterial.content,
+                        start: startMs,
+                        end: endMs,
+                        startTime: segment.target_timerange.start,
+                        endTime:
+                          segment.target_timerange.start +
+                          segment.target_timerange.duration,
+                      });
+                    }
+                  }
+                }
+              }
+            });
+          }
+        });
+
+        // 按開始時間排序
+        subtitles.sort((a, b) => a.startTime - b.startTime);
+
+        // 生成 SRT 格式
+        let srtContent = "";
+
+        subtitles.forEach((subtitle, index) => {
+          // 序號
+          srtContent += index + 1 + "\n";
+
+          // 時間軸（轉換為 SRT 格式: 時:分:秒,毫秒）
+          const startTime = formatTimeToSRT(subtitle.startTime);
+          const endTime = formatTimeToSRT(subtitle.endTime);
+          srtContent += `${startTime} --> ${endTime}\n`;
+
+          // 字幕文本
+          srtContent += subtitle.text + "\n";
+
+          // 空行分隔
+          srtContent += "\n";
+        });
+
+        return srtContent.trim();
+      }
+
+      /**
+       * 將微秒時間轉換為 SRT 時間格式 (時:分:秒,毫秒)
+       * @param {number} microSeconds - 微秒時間
+       * @returns {string} - SRT 格式的時間字符串
+       */
+      function formatTimeToSRT(microSeconds) {
+        // 轉換為毫秒
+        const totalMs = microSeconds / 1000;
+
+        // 計算小時、分鐘、秒和毫秒
+        const hours = Math.floor(totalMs / 3600000);
+        const minutes = Math.floor((totalMs % 3600000) / 60000);
+        const seconds = Math.floor((totalMs % 60000) / 1000);
+        const milliseconds = Math.floor(totalMs % 1000);
+
+        // 格式化為兩位數
+        const pad = (num, length = 2) => num.toString().padStart(length, "0");
+
+        return `${pad(hours)}:${pad(minutes)}:${pad(seconds)},${pad(
+          milliseconds,
+          3
+        )}`;
+      }
+
+      // 工具函數
+      function formatFileSize(bytes) {
+        if (bytes === 0) return "0 Bytes";
+        const k = 1024;
+        const sizes = ["Bytes", "KB", "MB", "GB"];
+        const i = Math.floor(Math.log(bytes) / Math.log(k));
+        return parseFloat((bytes / Math.pow(k, i)).toFixed(2)) + " " + sizes[i];
+      }
+
+      function showToast(message, type = "default") {
+        toastMessage.textContent = message;
+        toast.className = "toast";
+        toast.classList.add(
+          type === "error"
+            ? "error"
+            : type === "success"
+            ? "success"
+            : "default"
+        );
+        toast.classList.add("show");
+
+        setTimeout(() => {
+          toast.classList.remove("show");
+        }, 3000);
+      }
+
+      // 初始化說明
+      document.addEventListener("DOMContentLoaded", () => {
+        console.log("字幕提取器已加載。請將視頻編輯項目文件拖放到指定區域。");
+      });
+    </script>
+  </body>
+</html>
