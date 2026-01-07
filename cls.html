@@ -1,0 +1,1063 @@
+<!DOCTYPE html>
+<html lang="zh-TW">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Social Buttons Collection</title>
+    <style>
+      * {
+        margin: 0;
+        padding: 0;
+        box-sizing: border-box;
+      }
+
+      body {
+        min-height: 100vh;
+        background: linear-gradient(135deg, #1a1a2e 0%, #16213e 100%);
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        padding: 40px 20px;
+        font-family: "Segoe UI", Tahoma, Geneva, Verdana, sans-serif;
+        gap: 40px;
+        cursor: pointer;
+        padding-bottom: 300px;
+      }
+
+      h1 {
+        color: white;
+        text-align: center;
+        margin-bottom: 20px;
+      }
+
+      .style-section {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 15px;
+      }
+
+      .style-title {
+        color: #fff;
+        font-size: 1.2rem;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 2px;
+      }
+
+      .btn-container {
+        display: flex;
+        gap: 20px;
+        padding: 25px 35px;
+        background: white;
+        border-radius: 20px;
+        box-shadow: 0 10px 40px rgba(0, 0, 0, 0.3);
+      }
+
+      .btn {
+        width: 60px;
+        height: 60px;
+        border: none;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.3s ease;
+        position: relative;
+        overflow: hidden;
+      }
+
+      .btn svg {
+        width: 28px;
+        height: 28px;
+        transition: all 0.3s ease;
+        position: relative;
+        z-index: 1;
+      }
+
+      /* 控制面板樣式 */
+      .controls {
+        position: fixed;
+        bottom: 20px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.9);
+        padding: 15px 30px;
+        border-radius: 50px;
+        display: flex;
+        gap: 20px;
+        align-items: center;
+        box-shadow: 0 5px 25px rgba(0, 0, 0, 0.2);
+        z-index: 100;
+      }
+
+      .controls label {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        font-weight: 600;
+        color: #333;
+        cursor: pointer;
+      }
+
+      .controls input[type="checkbox"] {
+        width: 18px;
+        height: 18px;
+        cursor: pointer;
+      }
+
+      .controls button {
+        background: #4a6ee0;
+        color: white;
+        border: none;
+        padding: 8px 20px;
+        border-radius: 25px;
+        cursor: pointer;
+        font-weight: 600;
+        transition: all 0.3s ease;
+      }
+
+      .controls button:hover {
+        background: #3a5ed0;
+        transform: translateY(-2px);
+      }
+
+      .controls .speed-control {
+        display: flex;
+        align-items: center;
+        gap: 10px;
+      }
+
+      .controls .speed-control input {
+        width: 120px;
+      }
+
+      .controls .action-controls {
+        display: flex;
+        gap: 10px;
+      }
+
+      .controls .action-controls button {
+        background: #666;
+        font-size: 0.8rem;
+        padding: 5px 10px;
+      }
+
+      .controls .action-controls button:hover {
+        background: #555;
+      }
+
+      /* 當前動畫指示器 */
+      .current-animation {
+        position: absolute;
+        top: -30px;
+        left: 50%;
+        transform: translateX(-50%);
+        background: rgba(255, 255, 255, 0.9);
+        padding: 5px 15px;
+        border-radius: 15px;
+        font-size: 0.9rem;
+        color: #333;
+        font-weight: 600;
+        opacity: 0;
+        transition: opacity 0.3s ease;
+        white-space: nowrap;
+      }
+
+      .current-animation.show {
+        opacity: 1;
+      }
+
+      /* 狀態指示器 */
+      .status-indicator {
+        position: fixed;
+        top: 20px;
+        right: 20px;
+        background: rgba(255, 255, 255, 0.9);
+        padding: 10px 15px;
+        border-radius: 10px;
+        font-size: 0.8rem;
+        color: #333;
+        display: flex;
+        flex-direction: column;
+        gap: 5px;
+        box-shadow: 0 3px 15px rgba(0, 0, 0, 0.2);
+        z-index: 100;
+      }
+
+      .status-item {
+        display: flex;
+        align-items: center;
+        gap: 5px;
+      }
+
+      .status-dot {
+        width: 10px;
+        height: 10px;
+        border-radius: 50%;
+        background: #ddd;
+      }
+
+      .status-dot.active {
+        background: #4CAF50;
+      }
+
+      /* ===== 可愛風格 Cute Style ===== */
+      .cute .btn-container {
+        background: linear-gradient(145deg, #fff5f8, #ffffff);
+        border-radius: 30px;
+        border: 3px dashed #ffb6c1;
+      }
+
+      .cute .btn {
+        border-radius: 50%;
+        background: linear-gradient(145deg, #ffe4ec, #ffb6c1);
+        box-shadow: 0 4px 15px rgba(255, 182, 193, 0.4);
+      }
+
+      .cute .btn svg {
+        fill: #ff69b4;
+      }
+
+      .cute .btn:hover {
+        transform: scale(1.15) rotate(10deg);
+        box-shadow: 0 6px 20px rgba(255, 105, 180, 0.5);
+      }
+
+      .cute .btn:active {
+        transform: scale(0.9);
+      }
+
+      .cute .btn.active {
+        background: linear-gradient(145deg, #ff69b4, #ff1493);
+        animation: cute-bounce 0.5s ease;
+      }
+
+      .cute .btn.active svg {
+        fill: white;
+      }
+
+      @keyframes cute-bounce {
+        0%,
+        100% {
+          transform: scale(1);
+        }
+        25% {
+          transform: scale(1.3) rotate(-15deg);
+        }
+        50% {
+          transform: scale(0.9) rotate(15deg);
+        }
+        75% {
+          transform: scale(1.1) rotate(-5deg);
+        }
+      }
+
+      /* ===== 酷酷風格 Cool Style ===== */
+      .cool .btn-container {
+        background: linear-gradient(145deg, #2d2d2d, #1a1a1a);
+        border-radius: 15px;
+        border: 1px solid #444;
+      }
+
+      .cool .btn {
+        border-radius: 12px;
+        background: linear-gradient(145deg, #3a3a3a, #2a2a2a);
+        box-shadow: 5px 5px 15px #1a1a1a, -5px -5px 15px #3a3a3a;
+      }
+
+      .cool .btn svg {
+        fill: #888;
+      }
+
+      .cool .btn:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 30px rgba(0, 200, 255, 0.3);
+      }
+
+      .cool .btn:hover svg {
+        fill: #2e00c5;
+      }
+
+      .cool .btn:active {
+        transform: translateY(2px);
+        box-shadow: inset 3px 3px 10px #1a1a1a;
+      }
+
+      .cool .btn.active {
+        background: linear-gradient(145deg, #3600e9, #2900b1);
+        box-shadow: 0 0 15px rgba(0, 200, 255, 0.6),
+          inset 0 0 15px rgba(255, 255, 255, 0.1);
+      }
+
+      .cool .btn.active svg {
+        fill: white;
+        filter: drop-shadow(0 0 5px white);
+      }
+
+      /* ===== 哥德風格 Gothic Style - 減少陰影範圍 ===== */
+      .gothic .btn-container {
+        background: linear-gradient(145deg, #1a0a0a, #2a1515);
+        border-radius: 10px;
+        border: 2px solid #8b0000;
+        box-shadow: inset 0 0 10px rgba(139, 0, 0, 0.2); /* 減少內部陰影 */
+      }
+
+      .gothic .btn {
+        border-radius: 8px;
+        background: linear-gradient(145deg, #2a1a1a, #1a0a0a);
+        border: 1px solid #5a0000;
+        box-shadow: 0 0 8px rgba(139, 0, 0, 0.4); /* 減少外部陰影範圍和強度 */
+      }
+
+      .gothic .btn svg {
+        fill: #8b0000;
+      }
+
+      .gothic .btn:hover {
+        transform: scale(1.05); /* 減少放大效果 */
+        box-shadow: 0 0 15px rgba(139, 0, 0, 0.5), /* 減少陰影範圍 */
+          inset 0 0 10px rgba(139, 0, 0, 0.2);
+      }
+
+      .gothic .btn:hover svg {
+        fill: #dc143c;
+      }
+
+      .gothic .btn:active {
+        transform: scale(0.95);
+      }
+
+      .gothic .btn.active {
+        background: linear-gradient(145deg, #8b0000, #5a0000);
+        box-shadow: 0 0 20px rgba(220, 20, 60, 0.6), /* 減少發光範圍 */
+          0 0 30px rgba(139, 0, 0, 0.3); /* 減少第二層陰影 */
+        animation: gothic-pulse 1.5s ease-in-out infinite;
+      }
+
+      .gothic .btn.active svg {
+        fill: #fff;
+      }
+
+      @keyframes gothic-pulse {
+        0%,
+        100% {
+          box-shadow: 0 0 20px rgba(220, 20, 60, 0.6);
+        }
+        50% {
+          box-shadow: 0 0 30px rgba(220, 20, 60, 0.8), /* 減少最大發光範圍 */
+            0 0 40px rgba(139, 0, 0, 0.4); /* 減少擴散範圍 */
+        }
+      }
+
+      /* ===== 霓虹風格 Neon Style - 減少陰影範圍 ===== */
+      .neon .btn-container {
+        background: #0a0a0a;
+        border-radius: 20px;
+        border: 2px solid #333;
+      }
+
+      .neon .btn {
+        border-radius: 50%;
+        background: transparent;
+        border: 2px solid #0ff;
+        box-shadow: 0 0 8px #0ff, /* 減少外部發光 */
+          inset 0 0 8px rgba(0, 255, 255, 0.1); /* 減少內部發光 */
+      }
+
+      .neon .btn svg {
+        fill: #0ff;
+        filter: drop-shadow(0 0 3px #0ff); /* 減少圖標發光 */
+      }
+
+      .neon .btn:nth-child(2) {
+        border-color: #f0f;
+        box-shadow: 0 0 8px #f0f, 
+          inset 0 0 8px rgba(255, 0, 255, 0.1);
+      }
+
+      .neon .btn:nth-child(2) svg {
+        fill: #f0f;
+        filter: drop-shadow(0 0 3px #f0f);
+      }
+
+      .neon .btn:nth-child(3) {
+        border-color: #0f0;
+        box-shadow: 0 0 8px #0f0, 
+          inset 0 0 8px rgba(0, 255, 0, 0.1);
+      }
+
+      .neon .btn:nth-child(3) svg {
+        fill: #0f0;
+        filter: drop-shadow(0 0 3px #0f0);
+      }
+
+      .neon .btn:hover {
+        transform: scale(1.1); /* 減少放大效果 */
+        animation: neon-flicker 0.3s ease;
+      }
+
+      .neon .btn:active {
+        transform: scale(0.9);
+      }
+
+      .neon .btn.active {
+        background: #0ff;
+        box-shadow: 0 0 20px #0ff, /* 減少發光層數和範圍 */
+          0 0 30px #0ff; /* 只保留兩層發光 */
+      }
+
+      .neon .btn.active svg {
+        fill: #000;
+        filter: none;
+      }
+
+      .neon .btn:nth-child(2).active {
+        background: #f0f;
+        box-shadow: 0 0 20px #f0f,
+          0 0 30px #f0f;
+      }
+
+      .neon .btn:nth-child(3).active {
+        background: #0f0;
+        box-shadow: 0 0 20px #0f0,
+          0 0 30px #0f0;
+      }
+
+      @keyframes neon-flicker {
+        0%,
+        100% {
+          opacity: 1;
+        }
+        50% {
+          opacity: 0.8; /* 減少閃爍強度 */
+        }
+      }
+
+      /* ===== 極簡風格 Minimal Style ===== */
+      .minimal .btn-container {
+        background: #fafafa;
+        border-radius: 50px;
+        padding: 15px 30px;
+      }
+
+      .minimal .btn {
+        width: 50px;
+        height: 50px;
+        border-radius: 50%;
+        background: transparent;
+        border: 2px solid #ddd;
+      }
+
+      .minimal .btn svg {
+        fill: #999;
+        width: 22px;
+        height: 22px;
+      }
+
+      .minimal .btn:hover {
+        border-color: #333;
+        transform: scale(1.05);
+      }
+
+      .minimal .btn:hover svg {
+        fill: #333;
+      }
+
+      .minimal .btn:active {
+        transform: scale(0.95);
+      }
+
+      .minimal .btn.active {
+        background: #333;
+        border-color: #333;
+      }
+
+      .minimal .btn.active svg {
+        fill: white;
+      }
+
+      /* ===== 復古風格 Retro Style ===== */
+      .retro .btn-container {
+        background: linear-gradient(145deg, #f5e6d3, #e8d4bc);
+        border-radius: 0;
+        border: 4px solid #8b4513;
+        box-shadow: 8px 8px 0 #5a2d0a;
+      }
+
+      .retro .btn {
+        border-radius: 0;
+        background: linear-gradient(145deg, #ff6b35, #f7931e);
+        border: 3px solid #8b4513;
+        box-shadow: 4px 4px 0 #5a2d0a;
+      }
+
+      .retro .btn svg {
+        fill: #5a2d0a;
+      }
+
+      .retro .btn:hover {
+        transform: translate(-2px, -2px);
+        box-shadow: 6px 6px 0 #5a2d0a;
+      }
+
+      .retro .btn:active {
+        transform: translate(2px, 2px);
+        box-shadow: 2px 2px 0 #5a2d0a;
+      }
+
+      .retro .btn.active {
+        background: linear-gradient(145deg, #1e90ff, #4169e1);
+        animation: retro-shake 0.3s ease;
+      }
+
+      .retro .btn.active svg {
+        fill: #fff;
+      }
+
+      @keyframes retro-shake {
+        0%,
+        100% {
+          transform: translate(0);
+        }
+        25% {
+          transform: translate(-3px, 3px);
+        }
+        50% {
+          transform: translate(3px, -3px);
+        }
+        75% {
+          transform: translate(-3px, -3px);
+        }
+      }
+
+      /* ===== 玻璃風格 Glass Style ===== */
+      .glass .btn-container {
+        background: rgba(255, 255, 255, 0.15);
+        backdrop-filter: blur(20px);
+        border-radius: 25px;
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .glass .btn {
+        border-radius: 15px;
+        background: rgba(255, 255, 255, 0.2);
+        backdrop-filter: blur(10px);
+        border: 1px solid rgba(255, 255, 255, 0.3);
+      }
+
+      .glass .btn svg {
+        fill: rgba(255, 255, 255, 0.8);
+      }
+
+      .glass .btn:hover {
+        background: rgba(255, 255, 255, 0.35);
+        transform: translateY(-3px);
+        box-shadow: 0 10px 30px rgba(255, 255, 255, 0.2);
+      }
+
+      .glass .btn:active {
+        transform: translateY(1px);
+      }
+
+      .glass .btn.active {
+        background: rgba(255, 255, 255, 0.5);
+        box-shadow: 0 0 30px rgba(255, 255, 255, 0.4);
+      }
+
+      .glass .btn.active svg {
+        fill: #333;
+      }
+
+      /* ===== 糖果風格 Candy Style ===== */
+      .candy .btn-container {
+        background: linear-gradient(145deg, #fff, #f0f0f0);
+        border-radius: 30px;
+        border: 3px solid #fff;
+        box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+      }
+
+      .candy .btn {
+        border-radius: 20px;
+        background: linear-gradient(145deg, #ff6b6b, #ee5a5a);
+        box-shadow: 0 6px 0 #cc4545, 0 8px 15px rgba(255, 107, 107, 0.4);
+      }
+
+      .candy .btn:nth-child(2) {
+        background: linear-gradient(145deg, #4ecdc4, #3dbdb5);
+        box-shadow: 0 6px 0 #2a9d96, 0 8px 15px rgba(78, 205, 196, 0.4);
+      }
+
+      .candy .btn:nth-child(3) {
+        background: linear-gradient(145deg, #ffe66d, #ffd93d);
+        box-shadow: 0 6px 0 #ccad00, 0 8px 15px rgba(255, 230, 109, 0.4);
+      }
+
+      .candy .btn svg {
+        fill: white;
+      }
+
+      .candy .btn:nth-child(3) svg {
+        fill: #8b7000;
+      }
+
+      .candy .btn:hover {
+        transform: translateY(-3px);
+      }
+
+      .candy .btn:active {
+        transform: translateY(4px);
+        box-shadow: 0 2px 0 #cc4545;
+      }
+
+      .candy .btn:nth-child(2):active {
+        box-shadow: 0 2px 0 #2a9d96;
+      }
+
+      .candy .btn:nth-child(3):active {
+        box-shadow: 0 2px 0 #ccad00;
+      }
+
+      .candy .btn.active {
+        animation: candy-pop 0.4s ease;
+      }
+
+      @keyframes candy-pop {
+        0% {
+          transform: scale(1);
+        }
+        50% {
+          transform: scale(1.3);
+        }
+        100% {
+          transform: scale(1);
+        }
+      }
+    </style>
+  </head>
+  <body>
+    <h1>Social Buttons Collection</h1>
+    
+    <!-- 狀態指示器 -->
+    <div class="status-indicator" id="statusIndicator">
+      <div class="status-item">
+        <span class="status-dot" id="commentStatus"></span>
+        <span>留言按鈕</span>
+      </div>
+      <div class="status-item">
+        <span class="status-dot" id="likeStatus"></span>
+        <span>按讚按鈕</span>
+      </div>
+      <div class="status-item">
+        <span class="status-dot" id="subscribeStatus"></span>
+        <span>訂閱按鈕</span>
+      </div>
+    </div>
+
+    <!-- 可愛風格 -->
+    <div class="style-section cute">
+      <span class="style-title">🌸 可愛風格 Cute</span>
+      <div class="btn-container">
+        <button class="btn" data-action="comment" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"
+            />
+          </svg>
+        </button>
+        <button class="btn" data-action="like" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+            />
+          </svg>
+        </button>
+        <button class="btn" data-action="subscribe" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- 酷酷風格 -->
+    <div class="style-section cool">
+      <span class="style-title">❄️ 酷酷風格 Cool</span>
+      <div class="btn-container">
+        <button class="btn" data-action="comment" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"
+            />
+          </svg>
+        </button>
+        <button class="btn" data-action="like" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+            />
+          </svg>
+        </button>
+        <button class="btn" data-action="subscribe" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- 哥德風格 - 陰影已減少 -->
+    <div class="style-section gothic">
+      <span class="style-title">🦇 哥德風格 Gothic</span>
+      <div class="btn-container">
+        <button class="btn" data-action="comment" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"
+            />
+          </svg>
+        </button>
+        <button class="btn" data-action="like" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+            />
+          </svg>
+        </button>
+        <button class="btn" data-action="subscribe" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- 霓虹風格 - 陰影已減少 -->
+    <div class="style-section neon">
+      <span class="style-title">💫 霓虹風格 Neon</span>
+      <div class="btn-container">
+        <button class="btn" data-action="comment" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"
+            />
+          </svg>
+        </button>
+        <button class="btn" data-action="like" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+            />
+          </svg>
+        </button>
+        <button class="btn" data-action="subscribe" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- 極簡風格 -->
+    <div class="style-section minimal">
+      <span class="style-title">⚪ 極簡風格 Minimal</span>
+      <div class="btn-container">
+        <button class="btn" data-action="comment" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"
+            />
+          </svg>
+        </button>
+        <button class="btn" data-action="like" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+            />
+          </svg>
+        </button>
+        <button class="btn" data-action="subscribe" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- 復古風格 -->
+    <div class="style-section retro">
+      <span class="style-title">🕹️ 復古風格 Retro</span>
+      <div class="btn-container">
+        <button class="btn" data-action="comment" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"
+            />
+          </svg>
+        </button>
+        <button class="btn" data-action="like" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+            />
+          </svg>
+        </button>
+        <button class="btn" data-action="subscribe" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- 玻璃風格 -->
+    <div class="style-section glass">
+      <span class="style-title">🔮 玻璃風格 Glass</span>
+      <div class="btn-container">
+        <button class="btn" data-action="comment" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"
+            />
+          </svg>
+        </button>
+        <button class="btn" data-action="like" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+            />
+          </svg>
+        </button>
+        <button class="btn" data-action="subscribe" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- 糖果風格 -->
+    <div class="style-section candy">
+      <span class="style-title">🍬 糖果風格 Candy</span>
+      <div class="btn-container">
+        <button class="btn" data-action="comment" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M21.99 4c0-1.1-.89-2-1.99-2H4c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h14l4 4-.01-18zM18 14H6v-2h12v2zm0-3H6V9h12v2zm0-3H6V6h12v2z"
+            />
+          </svg>
+        </button>
+        <button class="btn" data-action="like" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24">
+            <path
+              d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z"
+            />
+          </svg>
+        </button>
+        <button class="btn" data-action="subscribe" onclick="toggleActive(this)">
+          <svg viewBox="0 0 24 24" fill="currentColor">
+            <path
+              d="M12 22c1.1 0 2-.9 2-2h-4c0 1.1.89 2 2 2zm6-6v-5c0-3.07-1.64-5.64-4.5-6.32V4c0-.83-.67-1.5-1.5-1.5s-1.5.67-1.5 1.5v.68C7.63 5.36 6 7.92 6 11v5l-2 2v1h16v-1l-2-2z"
+            />
+          </svg>
+        </button>
+      </div>
+    </div>
+
+    <!-- 控制面板 -->
+    <div class="controls">
+      <label>
+        <input type="checkbox" id="autoPlayToggle" checked> 自動播放
+      </label>
+      <div class="speed-control">
+        <span>速度:</span>
+        <input type="range" id="speedControl" min="100" max="2000" value="800" step="100">
+        <span id="speedValue">800ms</span>
+      </div>
+      <button id="manualTrigger">手動觸發下一步</button>
+      <div class="action-controls">
+        <button id="resetAll">重置所有</button>
+        <button id="toggleAll">切換所有</button>
+      </div>
+    </div>
+
+    <script>
+      // 原始點擊切換功能
+      function toggleActive(btn) {
+        btn.classList.toggle("active");
+        updateStatusIndicator();
+      }
+
+      // 狀態追蹤
+      const activatedButtons = {
+        comment: new Set(),
+        like: new Set(),
+        subscribe: new Set()
+      };
+
+      // 自動播放功能
+      let autoPlayInterval;
+      let currentStep = 0;
+      const actions = ['comment', 'like', 'subscribe'];
+      const speedControl = document.getElementById('speedControl');
+      const speedValue = document.getElementById('speedValue');
+      const autoPlayToggle = document.getElementById('autoPlayToggle');
+      const manualTriggerBtn = document.getElementById('manualTrigger');
+      const resetAllBtn = document.getElementById('resetAll');
+      const toggleAllBtn = document.getElementById('toggleAll');
+
+      // 初始化
+      function initAutoPlay() {
+        updateSpeedDisplay();
+        startAutoPlay();
+        setupEventListeners();
+      }
+
+      // 更新速度顯示
+      function updateSpeedDisplay() {
+        speedValue.textContent = `${speedControl.value}ms`;
+      }
+
+      // 開始自動播放
+      function startAutoPlay() {
+        if (autoPlayInterval) clearInterval(autoPlayInterval);
+        
+        autoPlayInterval = setInterval(() => {
+          if (autoPlayToggle.checked) {
+            triggerNextAction();
+          }
+        }, parseInt(speedControl.value));
+      }
+
+      // 觸發下一個動作
+      function triggerNextAction() {
+        const currentAction = actions[currentStep];
+        
+        // 對所有按鈕組執行效果
+        const allButtons = document.querySelectorAll('.btn');
+        const targetButtons = Array.from(allButtons).filter(btn => 
+          btn.dataset.action === currentAction
+        );
+
+        // 記錄當前激活的按鈕
+        targetButtons.forEach(btn => {
+          if (!btn.classList.contains('active')) {
+            btn.classList.add('active');
+            // 記錄到已激活集合
+            activatedButtons[currentAction].add(btn);
+          }
+        });
+
+        // 更新狀態指示器
+        updateStatusIndicator();
+
+        // 更新步驟
+        currentStep = (currentStep + 1) % actions.length;
+      }
+
+      // 更新狀態指示器
+      function updateStatusIndicator() {
+        const commentStatus = document.getElementById('commentStatus');
+        const likeStatus = document.getElementById('likeStatus');
+        const subscribeStatus = document.getElementById('subscribeStatus');
+        
+        // 檢查每個按鈕類型是否有被激活的按鈕
+        const allCommentBtns = document.querySelectorAll('.btn[data-action="comment"]');
+        const allLikeBtns = document.querySelectorAll('.btn[data-action="like"]');
+        const allSubscribeBtns = document.querySelectorAll('.btn[data-action="subscribe"]');
+        
+        // 更新指示器狀態
+        commentStatus.classList.toggle('active', 
+          Array.from(allCommentBtns).some(btn => btn.classList.contains('active')));
+        
+        likeStatus.classList.toggle('active',
+          Array.from(allLikeBtns).some(btn => btn.classList.contains('active')));
+        
+        subscribeStatus.classList.toggle('active',
+          Array.from(allSubscribeBtns).some(btn => btn.classList.contains('active')));
+      }
+
+      // 重置所有按鈕
+      function resetAllButtons() {
+        const allButtons = document.querySelectorAll('.btn');
+        allButtons.forEach(btn => {
+          btn.classList.remove('active');
+        });
+        
+        // 清空記錄
+        activatedButtons.comment.clear();
+        activatedButtons.like.clear();
+        activatedButtons.subscribe.clear();
+        
+        updateStatusIndicator();
+      }
+
+      // 切換所有按鈕狀態
+      function toggleAllButtons() {
+        const allButtons = document.querySelectorAll('.btn');
+        const hasActive = Array.from(allButtons).some(btn => btn.classList.contains('active'));
+        
+        allButtons.forEach(btn => {
+          if (hasActive) {
+            btn.classList.remove('active');
+          } else {
+            btn.classList.add('active');
+          }
+        });
+        
+        updateStatusIndicator();
+      }
+
+      // 手動觸發下一步
+      function triggerNextStepManually() {
+        triggerNextAction();
+      }
+
+      // 設置事件監聽器
+      function setupEventListeners() {
+        speedControl.addEventListener('input', () => {
+          updateSpeedDisplay();
+          if (autoPlayToggle.checked) {
+            startAutoPlay();
+          }
+        });
+
+        autoPlayToggle.addEventListener('change', () => {
+          if (autoPlayToggle.checked) {
+            startAutoPlay();
+          } else {
+            clearInterval(autoPlayInterval);
+          }
+        });
+
+        manualTriggerBtn.addEventListener('click', triggerNextStepManually);
+        resetAllBtn.addEventListener('click', resetAllButtons);
+        toggleAllBtn.addEventListener('click', toggleAllButtons);
+
+        // 監聽按鈕點擊事件，更新狀態
+        document.querySelectorAll('.btn').forEach(btn => {
+          btn.addEventListener('click', () => {
+            updateStatusIndicator();
+          });
+        });
+      }
+
+      // 初始化自動播放
+      window.addEventListener('DOMContentLoaded', initAutoPlay);
+    </script>
+  </body>
+</html>
