@@ -3,7 +3,7 @@
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>科技風格文字轉換器</title>
+    <title>文字轉換器</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
     <style>
       @font-face {
@@ -71,9 +71,29 @@
         src: url("kaiu.ttf") format("truetype");
       }
 
+       @font-face {
+        font-family: "gothic-r";
+        src: url("gothic-regular.ttf") format("truetype");
+      }
+
+       @font-face {
+        font-family: "gothic-b";
+        src: url("gothic-bold.ttf") format("truetype");
+      }
+
+       @font-face {
+        font-family: "gothic-bl";
+        src: url("gothic-black.ttf") format("truetype");
+      }
+
       @font-face {
-        font-family: "oracle";
-        src: url("OracleFont.ttf") format("truetype");
+        font-family: "ThenKhung";
+        src: url("ThenKhung.ttf") format("truetype");
+      }
+      
+      @font-face {
+        font-family: "JiaGu";
+        src: url("JiaGuWen.ttf") format("truetype");
       }
 
       body {
@@ -263,7 +283,11 @@
             <option value="HanyiSentyPine">漢儀新蒂青松小楷</option>
             <option value="whz-zhong-hang-shu">王漢宗中行書體</option>
             <option value="kaiu">標楷體</option>
-            <option value="oracle">甲骨文</option>
+            <option value="gothic-r">黑薔薇哥德 (標準)</option>
+            <option value="gothic-b">黑薔薇哥德 (粗體)</option>
+            <option value="gothic-bl">黑薔薇哥德 (黑體)</option>
+            <option value="ThenKhung">宇文天穹</option>
+            <option value="JiaGu">方正甲骨文</option>
           </select>
         </label>
       </div>
