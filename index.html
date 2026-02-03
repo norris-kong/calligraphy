@@ -1,79 +1,119 @@
-<!DOCTYPE html>
+<!doctype html>
 <html lang="zh-Hant-TW">
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>科技風格文字轉換器</title>
+    <title>文字轉換器</title>
     <script src="https://html2canvas.hertzen.com/dist/html2canvas.js"></script>
     <style>
       @font-face {
         font-family: "kim";
-        src: url("kim.ttf") format("truetype");
+        src: url("fonts/kim.ttf") format("truetype");
       }
 
       @font-face {
         font-family: "kim2";
-        src: url("kim2.ttf") format("truetype");
+        src: url("fonts/kim2.ttf") format("truetype");
       }
 
       @font-face {
         font-family: "xiao-yao";
-        src: url("xiao-yao.ttf") format("truetype");
+        src: url("fonts/xiao-yao.ttf") format("truetype");
       }
 
       @font-face {
         font-family: "qian-li";
-        src: url("qian-li.ttf") format("truetype");
+        src: url("fonts/qian-li.ttf") format("truetype");
       }
 
       @font-face {
         font-family: "beauty";
-        src: url("beauty.ttf") format("truetype");
+        src: url("fonts/beauty.ttf") format("truetype");
       }
 
       @font-face {
         font-family: "PenCrane";
-        src: url("PenCrane.ttf") format("truetype");
+        src: url("fonts/PenCrane.ttf") format("truetype");
       }
 
       @font-face {
         font-family: "HuiZongGongTi";
-        src: url("HuiZongGongTi.ttf") format("truetype");
+        src: url("fonts/HuiZongGongTi.ttf") format("truetype");
       }
 
       @font-face {
         font-family: "hua-kang-hang-shu";
-        src: url("hua-kang-hang-shu.ttf") format("truetype");
+        src: url("fonts/hua-kang-hang-shu.ttf") format("truetype");
       }
 
       @font-face {
         font-family: "hua-kang-hang-kai";
-        src: url("hua-kang-hang-kai.ttf") format("truetype");
+        src: url("fonts/hua-kang-hang-kai.ttf") format("truetype");
       }
 
       @font-face {
         font-family: "ThePeak";
-        src: url("ThePeak.ttf") format("truetype");
+        src: url("fonts/ThePeak.ttf") format("truetype");
       }
 
       @font-face {
         font-family: "HanyiSentyPine";
-        src: url("HanyiSentyPine.ttf") format("truetype");
+        src: url("fonts/HanyiSentyPine.ttf") format("truetype");
       }
 
       @font-face {
         font-family: "whz-zhong-hang-shu";
-        src: url("whz-zhong-hang-shu.TTF") format("truetype");
+        src: url("fonts/whz-zhong-hang-shu.ttf") format("truetype");
       }
 
       @font-face {
         font-family: "kaiu";
-        src: url("kaiu.ttf") format("truetype");
+        src: url("fonts/kaiu.ttf") format("truetype");
       }
 
       @font-face {
-        font-family: "oracle";
-        src: url("OracleFont.ttf") format("truetype");
+        font-family: "gothic-r";
+        src: url("fonts/gothic-regular.ttf") format("truetype");
+      }
+
+      @font-face {
+        font-family: "gothic-b";
+        src: url("fonts/gothic-bold.ttf") format("truetype");
+      }
+
+      @font-face {
+        font-family: "gothic-bl";
+        src: url("fonts/gothic-black.ttf") format("truetype");
+      }
+
+      @font-face {
+        font-family: "ThenKhung";
+        src: url("fonts/ThenKhung.ttf") format("truetype");
+      }
+
+      @font-face {
+        font-family: "JiaGu";
+        src: url("fonts/JiaGuWen.ttf") format("truetype");
+      }
+
+      @font-face {
+        font-family: "ChenYuluoyan";
+        src: url("fonts/ChenYuluoyan.ttf") format("truetype");
+      }
+
+      @font-face {
+        font-family: "TinHeng";
+        src: url("fonts/TinHeng.ttf") format("truetype");
+      }
+
+      @font-face {
+        font-family: "YuWeiYunMo";
+        src: url("fonts/YuWeiYunMo.ttf") format("truetype");
+      }
+
+      @font-face {
+        font-family: "YuWeiXingShu";
+        src: url("fonts/YuWeiXingShu.ttf") format("truetype");
       }
 
       body {
@@ -88,8 +128,15 @@
         align-items: center;
       }
 
-      .vertical-text {
-        writing-mode: vertical-rl;
+      .text-container {
+        margin-top: 20px;
+        width: 100%;
+        max-width: 800px;
+        display: flex;
+        justify-content: center;
+      }
+
+      .text-display {
         font-family: "kaiu";
         font-size: 56px;
         line-height: 1;
@@ -97,8 +144,17 @@
         padding: 50px;
         border-radius: 10px;
         box-shadow: 0 0 20px rgba(100, 128, 255, 0.3);
-        margin-top: 20px;
         color: rgb(180, 180, 180);
+        transition: all 0.3s ease;
+      }
+
+      .vertical-mode {
+        writing-mode: vertical-rl;
+      }
+
+      .horizontal-mode {
+        writing-mode: horizontal-tb;
+        width: 100%;
       }
 
       p {
@@ -115,6 +171,8 @@
         border-radius: 15px;
         box-shadow: 0 0 30px rgba(100, 128, 255, 0.2);
         border: 1px solid #64c4ff;
+        width: 100%;
+        max-width: 800px;
       }
 
       .control-form h1 {
@@ -200,11 +258,43 @@
       #font-family-select {
         margin-top: 5px;
       }
+
+      .display-toggle {
+        display: flex;
+        justify-content: center;
+        margin-bottom: 20px;
+        width: 100%;
+        max-width: 800px;
+      }
+
+      .toggle-button {
+        background-color: #172a45;
+        color: #64c4ff;
+        border: 1px solid #64c4ff;
+        padding: 10px 20px;
+        border-radius: 5px;
+        cursor: pointer;
+        font-family: "Courier New", monospace;
+        font-size: 16px;
+        transition: all 0.3s ease;
+        margin: 0 5px;
+      }
+
+      .toggle-button:hover {
+        background-color: #64c4ff;
+        color: #0a192f;
+      }
+
+      .toggle-button.active {
+        background-color: #64c4ff;
+        color: #0a192f;
+        font-weight: bold;
+      }
     </style>
   </head>
   <body>
     <div class="control-form">
-      <h1>科技文字轉換器</h1>
+      <h1>文字轉換器</h1>
       <textarea
         id="input-text"
         rows="10"
@@ -263,16 +353,37 @@
             <option value="HanyiSentyPine">漢儀新蒂青松小楷</option>
             <option value="whz-zhong-hang-shu">王漢宗中行書體</option>
             <option value="kaiu">標楷體</option>
-            <option value="oracle">甲骨文</option>
+            <option value="gothic-r">黑薔薇哥德 (標準)</option>
+            <option value="gothic-b">黑薔薇哥德 (粗體)</option>
+            <option value="gothic-bl">黑薔薇哥德 (黑體)</option>
+            <option value="ThenKhung">宇文天穹</option>
+            <option value="JiaGu">方正甲骨文</option>
+            <option value="ChenYuluoyan">辰宇落雁体</option>
+            <option value="TinHeng">字魂白鸽天行体</option>
+            <option value="YuWeiYunMo">禹衛書法雲墨繁體</option>
+            <option value="YuWeiXingShu">禹衛書法行書繁體</option>
           </select>
         </label>
       </div>
       <button onclick="splitText()">轉換文字</button>
     </div>
 
-    <div class="vertical-text" id="output-text"></div>
+    <div class="display-toggle">
+      <button class="toggle-button active" onclick="setDisplayMode('vertical')">
+        直式顯示
+      </button>
+      <button class="toggle-button" onclick="setDisplayMode('horizontal')">
+        橫式顯示
+      </button>
+    </div>
+
+    <div class="text-container">
+      <div class="text-display vertical-mode" id="output-text"></div>
+    </div>
 
     <script>
+      let currentMode = "vertical";
+
       function splitText() {
         const inputText = document.getElementById("input-text").value;
         const lines = inputText.split("\n");
@@ -282,28 +393,52 @@
 
       function changeLineHeight() {
         const lineHeightInput = document.getElementById("line-height-input");
-        const verticalText = document.querySelector(".vertical-text");
-        verticalText.style.lineHeight = lineHeightInput.value;
+        const outputText = document.getElementById("output-text");
+        outputText.style.lineHeight = lineHeightInput.value;
       }
 
       function changeFontSize() {
         const fontSizeInput = document.getElementById("font-size-input");
-        const verticalText = document.querySelector(".vertical-text");
-        verticalText.style.fontSize = fontSizeInput.value + "px";
+        const outputText = document.getElementById("output-text");
+        outputText.style.fontSize = fontSizeInput.value + "px";
       }
 
       function changeFontFamily() {
         const fontFamilySelect = document.getElementById("font-family-select");
-        const verticalText = document.querySelector(".vertical-text");
-        verticalText.style.fontFamily = fontFamilySelect.value;
+        const outputText = document.getElementById("output-text");
+        outputText.style.fontFamily = fontFamilySelect.value;
       }
 
       function changeLetterSpacing() {
         const letterSpacingInput = document.getElementById(
-          "letter-spacing-input"
+          "letter-spacing-input",
         );
-        const verticalText = document.querySelector(".vertical-text");
-        verticalText.style.letterSpacing = letterSpacingInput.value + "px";
+        const outputText = document.getElementById("output-text");
+        outputText.style.letterSpacing = letterSpacingInput.value + "px";
+      }
+
+      function setDisplayMode(mode) {
+        const outputText = document.getElementById("output-text");
+        const verticalButton = document.querySelector(
+          "[onclick=\"setDisplayMode('vertical')\"]",
+        );
+        const horizontalButton = document.querySelector(
+          "[onclick=\"setDisplayMode('horizontal')\"]",
+        );
+
+        if (mode === "vertical") {
+          outputText.classList.remove("horizontal-mode");
+          outputText.classList.add("vertical-mode");
+          verticalButton.classList.add("active");
+          horizontalButton.classList.remove("active");
+          currentMode = "vertical";
+        } else {
+          outputText.classList.remove("vertical-mode");
+          outputText.classList.add("horizontal-mode");
+          verticalButton.classList.remove("active");
+          horizontalButton.classList.add("active");
+          currentMode = "horizontal";
+        }
       }
     </script>
   </body>
