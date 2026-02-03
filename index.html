@@ -366,6 +366,13 @@
             <option value="YuWeiXingShu">禹衛書法行書繁體</option>
           </select>
         </label>
+        <label>
+          字體顏色
+          <select id="font-color-select" onchange="changeFontColor()">
+            <option value="#000000">黑色</option>
+            <option value="#b4b4b4">灰色</option>
+          </select>
+        </label>
       </div>
       <button onclick="splitText()">轉換文字</button>
     </div>
@@ -417,6 +424,12 @@
         );
         const outputText = document.getElementById("output-text");
         outputText.style.letterSpacing = letterSpacingInput.value + "px";
+      }
+
+      function changeFontColor() {
+        const fontColorSelect = document.getElementById("font-color-select");
+        const outputText = document.getElementById("output-text");
+        outputText.style.color = fontColorSelect.value;
       }
 
       function setDisplayMode(mode) {
